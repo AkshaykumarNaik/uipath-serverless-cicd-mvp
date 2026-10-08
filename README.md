@@ -53,6 +53,17 @@ Verified Serverless smoke test for package `calculator-agent:0.1.1`:
 - Queue item: `ORD-2001`, status `New`
 - Queue: `ValidatedOrders`
 
+## Performer stage
+
+The `process_order` entry point is the second stage. It accepts a queue transaction payload, produces a deterministic fulfillment ID from the queue reference, and can complete the transaction through the UiPath SDK when `complete_queue_item` is enabled. The default adapter is safe and local; replace it with an authenticated fulfillment API adapter when that integration is ready.
+
+Verified Serverless smoke test for package `calculator-agent:0.2.0`:
+
+- Process: `order-processor`
+- Entry point: `process_order`
+- Result: `FULFILL-ORD-2001`
+- Status: `Fulfilled`
+
 ## Source attribution
 
 The calculator implementation is adapted from the official UiPath Python SDK repository:
