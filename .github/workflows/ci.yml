@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 'latest'
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Compile Python source
+        run: uv run python -m compileall -q src tests
+
+      - name: Run tests
+        run: uv run pytest -q
+
+      - name: Verify UiPath function contract
+        shell: bash
+        run: |
+          test -f uipath.json
+          grep -q '"main": "src/main.py:main"' uipath.json
