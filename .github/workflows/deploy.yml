@@ -83,3 +83,44 @@ jobs:
       - name: Publish package to UiPath Processes feed
         run: |
           uv run uipath publish --tenant
+
+      - name: Install UiPath platform CLI
+        run: npm install --global @uipath/cli@1.202.2
+
+      - name: Authenticate UiPath platform CLI
+        env:
+          UIPATH_CLIENT_ID: ${{ secrets.UIPATH_CLIENT_ID }}
+          UIPATH_CLIENT_SECRET: ${{ secrets.UIPATH_CLIENT_SECRET }}
+          UIPATH_SCOPES: ${{ secrets.UIPATH_SCOPES }}
+        run: |
+          uip login \
+            --client-id "$UIPATH_CLIENT_ID" \
+            --client-secret "$UIPATH_CLIENT_SECRET" \
+            --organization "naikgrlypjq" \
+            --tenant "DefaultTenant" \
+            --scope "$UIPATH_SCOPES" \
+            --output json > /tmp/uip-login.json
+
+      - name: Update process to published release
+        env:
+          UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
+          UIPATH_RELEASE_VERSION: 0.2.${{ github.run_number }}
+        run: |
+          uip or processes update-version "$UIPATH_PROCESS_KEY" \
+            --package-version "$UIPATH_RELEASE_VERSION" \
+            --folder-path "RPA_Automation/RPA_Automation" \
+            --output json
+
+      - name: Start Serverless smoke job
+        env:
+          UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
+        run: |
+          uip or jobs start "$UIPATH_PROCESS_KEY" \
+            --folder-path "RPA_Automation/RPA_Automation" \
+            --runtime-type Serverless \
+            --input-arguments '{"transaction_key":"cd-smoke-${{ github.run_number }}","reference":"CD-SMOKE-${{ github.run_number }}","specific_content":{"source":"github-actions","commit":"${{ github.sha }}"},"complete_queue_item":false}' \
+            --reference "cd-${{ github.run_id }}" \
+            --wait-for-completion \
+            --timeout 300 \
+            --poll-interval 5 \
+            --output json
