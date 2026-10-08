@@ -118,6 +118,7 @@ jobs:
           uip or jobs start "$UIPATH_PROCESS_KEY" \
             --folder-path "RPA_Automation" \
             --runtime-type Serverless \
+            --run-as-me \
             --input-arguments '{"transaction_key":"cd-smoke-${{ github.run_number }}","reference":"CD-SMOKE-${{ github.run_number }}","specific_content":{"source":"github-actions","commit":"${{ github.sha }}"},"complete_queue_item":false}' \
             --reference "cd-${{ github.run_id }}" \
             --wait-for-completion \
