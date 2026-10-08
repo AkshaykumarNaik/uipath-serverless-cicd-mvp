@@ -66,9 +66,12 @@ jobs:
       - name: Pack Python function
         run: uv run uipath pack --nolock
 
-      - name: Verify deployment artifact
+      - name: Verify packed project contract
         shell: bash
-        run: test -n "$(find . -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.zip' \) -print -quit)"
+        run: |
+          test -f uipath.json
+          test -f entry-points.json
+          test -f project.uiproj
 
       - name: Publish package to UiPath Processes feed
         run: |
