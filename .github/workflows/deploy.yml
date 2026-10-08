@@ -112,6 +112,11 @@ jobs:
             --folder-path "RPA_Automation" \
             --output json
 
+          uip or processes update "$UIPATH_PROCESS_KEY" \
+            --entry-point "process_order" \
+            --folder-path "RPA_Automation" \
+            --output json
+
       - name: Start Serverless smoke job
         env:
           UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
