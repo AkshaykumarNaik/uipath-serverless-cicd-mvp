@@ -64,6 +64,10 @@ Verified Serverless smoke test for package `calculator-agent:0.2.0`:
 - Result: `FULFILL-ORD-2001`
 - Status: `Fulfilled`
 
+## Fulfillment adapter hardening
+
+`process_order` supports `fulfillment_mode=stub` for deterministic smoke tests and `fulfillment_mode=http` for production integration. HTTP mode reads `FULFILLMENT_API_URL` and `FULFILLMENT_API_TOKEN`, sends the queue reference as the `Idempotency-Key`, applies a 10-second timeout, retries transient 429/5xx/network failures up to three times, and returns a `retryable` failure flag without exposing the token.
+
 ## Source attribution
 
 The calculator implementation is adapted from the official UiPath Python SDK repository:

@@ -1,4 +1,4 @@
-"""Queue transaction performer with a deterministic fulfillment adapter."""
+"""Queue transaction performer with deterministic and HTTP fulfillment adapters."""
 
 from typing import Any
 
@@ -11,6 +11,7 @@ class FulfillmentInput(BaseModel):
     specific_content: dict[str, Any]
     queue_name: str = Field(default="ValidatedOrders", min_length=1, max_length=128)
     complete_queue_item: bool = False
+    fulfillment_mode: str = Field(default="stub", pattern="^(stub|http)$")
 
 
 class FulfillmentOutput(BaseModel):
@@ -20,6 +21,7 @@ class FulfillmentOutput(BaseModel):
     fulfillment_id: str
     queue_completed: bool
     error: str = ""
+    retryable: bool = False
 
 
 async def fulfill_order(data: FulfillmentInput) -> FulfillmentOutput:
@@ -29,7 +31,12 @@ async def fulfill_order(data: FulfillmentInput) -> FulfillmentOutput:
     can replace this block with an authenticated HTTP/API call while preserving
     the input/output contract and idempotency key.
     """
-    fulfillment_id = f"FULFILL-{data.reference}"
+    if data.fulfillment_mode == "http":
+        from src.fulfillment_client import fulfill_via_http
+
+        fulfillment_id = await fulfill_via_http(data.reference, data.specific_content)
+    else:
+        fulfillment_id = f"FULFILL-{data.reference}"
     queue_completed = False
 
     if data.complete_queue_item:
@@ -74,4 +81,5 @@ async def main(input_data: dict[str, Any]) -> FulfillmentOutput:
             fulfillment_id=f"FULFILL-{data.reference}",
             queue_completed=False,
             error=f"{type(exc).__name__}: {exc}",
+            retryable=bool(getattr(exc, "retryable", False)),
         )

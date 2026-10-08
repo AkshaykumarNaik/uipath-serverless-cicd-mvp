@@ -15,6 +15,7 @@ async def test_processor_is_deterministic_and_idempotent_by_reference():
     assert first.fulfillment_id == "FULFILL-ORD-2001"
     assert second.fulfillment_id == first.fulfillment_id
     assert first.queue_completed is False
+    assert first.retryable is False
 
 @pytest.mark.asyncio
 async def test_processor_returns_stable_failure_when_queue_completion_fails(monkeypatch):
@@ -30,6 +31,7 @@ async def test_processor_returns_stable_failure_when_queue_completion_fails(monk
     assert result.fulfillment_id == "FULFILL-ORD-2002"
     assert result.queue_completed is False
     assert "queue service unavailable" in result.error
+    assert result.retryable is False
 
 @pytest.mark.asyncio
 async def test_processor_rejects_overlong_reference():
