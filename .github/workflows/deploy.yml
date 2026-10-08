@@ -104,6 +104,7 @@ jobs:
       - name: Update process to published release
         env:
           UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
+          UIPATH_ROBOT_USER_KEY: ed1a6045-7b8f-4e3d-997a-b3a850866b65
           UIPATH_RELEASE_VERSION: 0.2.${{ github.run_number }}
         run: |
           uip or processes update-version "$UIPATH_PROCESS_KEY" \
@@ -114,11 +115,12 @@ jobs:
       - name: Start Serverless smoke job
         env:
           UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
+          UIPATH_ROBOT_USER_KEY: ed1a6045-7b8f-4e3d-997a-b3a850866b65
         run: |
           uip or jobs start "$UIPATH_PROCESS_KEY" \
             --folder-path "RPA_Automation" \
             --runtime-type Serverless \
-            --run-as-me \
+            --user-keys "$UIPATH_ROBOT_USER_KEY" \
             --input-arguments '{"transaction_key":"cd-smoke-${{ github.run_number }}","reference":"CD-SMOKE-${{ github.run_number }}","specific_content":{"source":"github-actions","commit":"${{ github.sha }}"},"complete_queue_item":false}' \
             --reference "cd-${{ github.run_id }}" \
             --wait-for-completion \
