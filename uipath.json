@@ -1,6 +1,7 @@
 {
   "functions": {
-    "main": "src/main.py:main"
+    "main": "src/main.py:main",
+    "validate_orders": "src/order_dispatcher.py:main"
   },
   "id": "d24460d6-3941-46ef-acac-7676c1be8911"
 }

@@ -41,6 +41,18 @@ Verified output:
 
 The successful job was a UiPath `Function` process with `TargetFramework: Portable`, `TargetRuntime: python`, and `ServerlessJobType: PythonCodedFunction`.
 
+## Complex automation: order validation and queue dispatch
+
+The `validate_orders` entry point accepts a batch of orders, rejects amounts above the configured limit or unsupported currencies, detects duplicate order references, and can dispatch accepted orders to the `ValidatedOrders` UiPath Queue. Queue dispatch uses unique references and `ProcessAllIndependently` bulk semantics.
+
+Verified Serverless smoke test for package `calculator-agent:0.1.1`:
+
+- Process: `order-validator-v2`
+- Input order: `ORD-2001`, INR 250
+- Result: one accepted order, `dispatched_count: 1`
+- Queue item: `ORD-2001`, status `New`
+- Queue: `ValidatedOrders`
+
 ## Source attribution
 
 The calculator implementation is adapted from the official UiPath Python SDK repository:
