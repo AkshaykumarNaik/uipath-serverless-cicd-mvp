@@ -23,6 +23,24 @@ The workflow publishes to the tenant Processes feed. The current tenant Processe
 
 Publishing the package is the CI/CD deployment boundary. A UiPath Function Release or process binding may still need to be created or updated in Orchestrator before a Serverless job can be started.
 
+## Verified Serverless deployment
+
+The package was bound to the `RPA_Automation` folder as process `calculator-agent` and executed with runtime type `Serverless`.
+
+Smoke-test input:
+
+```json
+{"a": 2, "b": 3, "operator": "+"}
+```
+
+Verified output:
+
+```json
+{"result": 5.0}
+```
+
+The successful job was a UiPath `Function` process with `TargetFramework: Portable`, `TargetRuntime: python`, and `ServerlessJobType: PythonCodedFunction`.
+
 ## Source attribution
 
 The calculator implementation is adapted from the official UiPath Python SDK repository:
