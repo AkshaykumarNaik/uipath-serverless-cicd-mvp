@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: uipath-serverless
+    concurrency:
+      group: uipath-serverless-production
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,6 +56,10 @@ jobs:
 
       - name: Pack Python function
         run: uv run uipath pack --nolock
+
+      - name: Verify deployment artifact
+        shell: bash
+        run: test -n "$(find . -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.zip' \) -print -quit)"
 
       - name: Publish package to UiPath Processes feed
         run: |

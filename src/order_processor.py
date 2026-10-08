@@ -7,9 +7,9 @@ from pydantic import BaseModel, Field, ValidationError
 
 class FulfillmentInput(BaseModel):
     transaction_key: str = Field(min_length=1)
-    reference: str = Field(min_length=1)
+    reference: str = Field(min_length=1, max_length=128)
     specific_content: dict[str, Any]
-    queue_name: str = "ValidatedOrders"
+    queue_name: str = Field(default="ValidatedOrders", min_length=1, max_length=128)
     complete_queue_item: bool = False
 
 
@@ -54,6 +54,24 @@ async def fulfill_order(data: FulfillmentInput) -> FulfillmentOutput:
 
 async def main(input_data: dict[str, Any]) -> FulfillmentOutput:
     try:
-        return await fulfill_order(FulfillmentInput(**input_data))
+        data = FulfillmentInput(**input_data)
     except ValidationError as exc:
-        return FulfillmentOutput("", "", "Invalid", "", False, str(exc))
+        return FulfillmentOutput(
+            transaction_key="",
+            reference="",
+            status="Invalid",
+            fulfillment_id="",
+            queue_completed=False,
+            error=str(exc),
+        )
+    try:
+        return await fulfill_order(data)
+    except Exception as exc:  # noqa: BLE001 - preserve a stable worker contract
+        return FulfillmentOutput(
+            transaction_key=data.transaction_key,
+            reference=data.reference,
+            status="Failed",
+            fulfillment_id=f"FULFILL-{data.reference}",
+            queue_completed=False,
+            error=f"{type(exc).__name__}: {exc}",
+        )
