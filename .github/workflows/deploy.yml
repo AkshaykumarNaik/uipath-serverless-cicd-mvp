@@ -108,7 +108,7 @@ jobs:
         run: |
           uip or processes update-version "$UIPATH_PROCESS_KEY" \
             --package-version "$UIPATH_RELEASE_VERSION" \
-            --folder-path "RPA_Automation/RPA_Automation" \
+            --folder-path "RPA_Automation" \
             --output json
 
       - name: Start Serverless smoke job
@@ -116,7 +116,7 @@ jobs:
           UIPATH_PROCESS_KEY: 8bc27b5e-aaf0-45ae-85d0-519e61771085
         run: |
           uip or jobs start "$UIPATH_PROCESS_KEY" \
-            --folder-path "RPA_Automation/RPA_Automation" \
+            --folder-path "RPA_Automation" \
             --runtime-type Serverless \
             --input-arguments '{"transaction_key":"cd-smoke-${{ github.run_number }}","reference":"CD-SMOKE-${{ github.run_number }}","specific_content":{"source":"github-actions","commit":"${{ github.sha }}"},"complete_queue_item":false}' \
             --reference "cd-${{ github.run_id }}" \
