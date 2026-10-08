@@ -17,7 +17,11 @@ uv run uipath run main '{"a": 2, "b": 3, "operator": "+"}'
 ## GitHub Actions
 
 - `ci.yml` runs on pull requests and pushes to `main`: dependency setup, compile check, tests, and project-contract checks.
-- `deploy.yml` is manually triggered and documents the UiPath deployment boundary. It should only be enabled after configuring the required UiPath credentials and deployment target.
+- `deploy.yml` is manually triggered. It authenticates with a UiPath confidential External Application, regenerates function metadata, packs the project, and publishes the package to the configured Orchestrator Processes feed.
+
+The deployment environment must define the non-secret variable `UIPATH_FEED_ID`. The current tenant Processes feed is `cbf16dfa-a275-426a-a67b-fc87326b082a`. The workflow uses the existing environment secrets `UIPATH_URL`, `UIPATH_CLIENT_ID`, `UIPATH_CLIENT_SECRET`, and `UIPATH_SCOPES`.
+
+Publishing the package is the CI/CD deployment boundary. A UiPath Function Release or process binding may still need to be created or updated in Orchestrator before a Serverless job can be started.
 
 ## Source attribution
 

@@ -30,12 +30,6 @@ jobs:
       - name: Run tests before deployment
         run: uv run pytest -q
 
-      - name: Install UiPath CLI
-        shell: bash
-        run: |
-          curl -fsSL https://download.uipath.com/uipath-cli/install.sh | bash
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
       - name: Authenticate to UiPath
         env:
           UIPATH_URL: ${{ secrets.UIPATH_URL }}
@@ -47,6 +41,22 @@ jobs:
           test -n "$UIPATH_CLIENT_ID"
           test -n "$UIPATH_CLIENT_SECRET"
           test -n "$UIPATH_SCOPES"
-          uipath auth --help
-          echo "Authentication command must be pinned to the installed CLI version before enabling deployment."
-          exit 1
+          uv run uipath auth \
+            --base-url "$UIPATH_URL" \
+            --client-id "$UIPATH_CLIENT_ID" \
+            --client-secret "$UIPATH_CLIENT_SECRET" \
+            --tenant "DefaultTenant" \
+            --scope "$UIPATH_SCOPES"
+
+      - name: Generate function metadata
+        run: uv run uipath init
+
+      - name: Pack Python function
+        run: uv run uipath pack --nolock
+
+      - name: Publish package to UiPath Processes feed
+        env:
+          UIPATH_FEED_ID: ${{ vars.UIPATH_FEED_ID }}
+        run: |
+          test -n "$UIPATH_FEED_ID"
+          uv run uipath publish --tenant --folder "RPA_Automation"
