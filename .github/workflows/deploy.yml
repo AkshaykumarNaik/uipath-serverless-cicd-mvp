@@ -63,6 +63,13 @@ jobs:
       - name: Generate function metadata
         run: uv run uipath init
 
+      - name: Set immutable release version
+        shell: bash
+        run: |
+          release_version="0.2.${{ github.run_number }}"
+          sed -i -E "s/^version = \"[^\"]+\"/version = \"${release_version}\"/" pyproject.toml
+          echo "Publishing calculator-agent ${release_version}"
+
       - name: Pack Python function
         run: uv run uipath pack --nolock
 
