@@ -55,8 +55,5 @@ jobs:
         run: uv run uipath pack --nolock
 
       - name: Publish package to UiPath Processes feed
-        env:
-          UIPATH_FEED_ID: ${{ vars.UIPATH_FEED_ID }}
         run: |
-          test -n "$UIPATH_FEED_ID"
           uv run uipath publish --tenant --folder "RPA_Automation"
