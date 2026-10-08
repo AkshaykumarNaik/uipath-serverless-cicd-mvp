@@ -85,7 +85,7 @@ jobs:
           uv run uipath publish --tenant
 
       - name: Install UiPath platform CLI
-        run: npm install --global @uipath/cli@1.202.2
+        run: npm install --global @uipath/cli@1.202.1
 
       - name: Authenticate UiPath platform CLI
         env:
